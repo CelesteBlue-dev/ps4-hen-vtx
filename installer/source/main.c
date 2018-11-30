@@ -5,15 +5,15 @@
 #define PS4_UPDATE_FULL_PATH "/update/PS4UPDATE.PUP"
 #define PS4_UPDATE_TEMP_PATH "/update/PS4UPDATE.PUP.net.temp"
 
-#define	KERN_XFAST_SYSCALL	0x1C0		// 5.05
-#define KERN_PRISON_0		0x10986A0
-#define KERN_ROOTVNODE		0x22C1A70
+#define	KERN_XFAST_SYSCALL	0x30B7D0 // 4.74
+#define KERN_PRISON_0		0x1042AB0 // 4.74
+#define KERN_ROOTVNODE		0x21B89E0 // 4.74
 
-#define KERN_PMAP_PROTECT	0x2E3090
-#define KERN_PMAP_PROTECT_P	0x2E30D4
-#define KERN_PMAP_STORE		0x22CB570
+#define KERN_PMAP_PROTECT	0x421180 // 4.74
+#define KERN_PMAP_PROTECT_P	0x4211C4 // 4.74
+#define KERN_PMAP_STORE		0x21C5A38 // 4.74
 
-#define DT_HASH_SEGMENT		0xB5EF30
+#define DT_HASH_SEGMENT		0xB26020 // 4.74
 
 extern char kpayload[];
 unsigned kpayload_size;
@@ -73,22 +73,21 @@ int install_payload(struct thread *td, struct install_payload_args* args)
   uint64_t cr0 = readCr0();
   writeCr0(cr0 & ~X86_CR0_WP);
 
-  // debug settings patches 5.05
-  *(char *)(kernel_base + 0x1CD0686) |= 0x14;
-  *(char *)(kernel_base + 0x1CD06A9) |= 3;
-  *(char *)(kernel_base + 0x1CD06AA) |= 1;
-  *(char *)(kernel_base + 0x1CD06C8) |= 1;
+  // debug settings patches 4.74
+  *(char *)(kernel_base + 0x1B7D086) |= 0x14;
+  *(char *)(kernel_base + 0x1B7D0A9) |= 3;
+  *(char *)(kernel_base + 0x1B7D0AA) |= 1;
+  *(char *)(kernel_base + 0x1B7D0C8) |= 1;
 
-  // debug menu error patches 5.05
-  *(uint32_t *)(kernel_base + 0x4F9048) = 0;
-  *(uint32_t *)(kernel_base + 0x4FA15C) = 0;
+  // debug menu error patches 4.74
+  *(uint32_t *)(kernel_base + 0x4D8777) = 0;
+  *(uint32_t *)(kernel_base + 0x4D9601) = 0;
 
-  // flatz disable pfs signature check 5.05
-  *(uint32_t *)(kernel_base + 0x6A2700) = 0x90C3C031;
+  // flatz disable pfs signature check 4.74
+  *(uint32_t *)(kernel_base + 0x60D5E0) = 0x90C3C031;
 
-  // flatz enable debug RIFs 5.05
-  *(uint32_t *)(kernel_base + 0x64B2B0) = 0x90C301B0;
-  *(uint32_t *)(kernel_base + 0x64B2D0) = 0x90C301B0;
+  // flatz enable debug RIFs 4.74 from 4.55
+  *(uint64_t *)(kernel_base + 0x6306FD) = 0x3D38EB00000001B8;
 
   // install kpayload
   memset(payload_buffer, 0, PAGE_SIZE);
